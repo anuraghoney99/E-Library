@@ -16,7 +16,7 @@ if uri and uri.startswith("postgres://"):
     # Fix for Render/SQLAlchemy compatibility
     uri = uri.replace("postgres://", "postgresql://", 1)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'uri'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'uri' or 'postgresql://postgres:root@localhost:5432/elibrary_db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
