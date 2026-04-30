@@ -23,6 +23,19 @@ else:
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
+
+if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()
+
+    if not User.query.filter_by(username='admin').first():
+
+     hashed_pw = generate_password_hash('admin123')
+    admin_user = User(username='admin', password=hashed_pw, role='admin')
+    db.session.add(admin_user)
+    db.session.commit()
+    print("Admin user created: admin / admin123")
+
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
@@ -129,16 +142,7 @@ def return_book(book_id):
         
     return redirect(url_for('index'))
 
-if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
-        
-        # --- AUTO-CREATE ADMIN IF NOT EXISTS ---
-        if not User.query.filter_by(username='admin').first():
-            hashed_pw = generate_password_hash('admin123')
-            admin_user = User(username='admin', password=hashed_pw, role='admin')
-            db.session.add(admin_user)
-            db.session.commit()
-            print("Admin user created: admin / admin123")
 
-    app.run(debug=True)
+
+
+app.run(debug=True)
