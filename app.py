@@ -9,15 +9,18 @@ import os
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'pokemonanddoraemon'
 
-# --- 2. REPLACE YOUR OLD DATABASE CONFIG WITH THIS ---
-uri = os.getenv("DATABASE_URL")  # This gets the link from Render's dashboard
+# In your main.py / app.py
+uri = os.getenv("DATABASE_URL")
 
-if uri and uri.startswith("postgres://"):
-    # Fix for Render/SQLAlchemy compatibility
-    uri = uri.replace("postgres://", "postgresql://", 1)
-
-app.config['SQLALCHEMY_DATABASE_URI'] = 'uri' or 'postgresql://postgres:root@localhost:5432/elibrary_db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+if uri:
+    if uri.startswith("postgres://"):
+        uri = uri.replace("postgres://", "postgresql://", 1)
+    app.config['SQLALCHEMY_DATABASE_URI'] = uri
+else:
+    # This acts as a safety net if Render fails to load the variable
+    print("WARNING: DATABASE_URL not found. Falling back to local SQLite.")
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///local_fallback.db'
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
 login_manager = LoginManager(app)
