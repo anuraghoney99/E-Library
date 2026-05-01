@@ -4,6 +4,9 @@ from models import db, User, Book
 from auth_utils import role_required
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
+import threading
+import requests
+import time
 
 app = Flask(__name__)
 
@@ -20,7 +23,6 @@ db.init_app(app)
 
 with app.app_context():
     db.create_all()
-    # Check for admin user inside the context
     admin = User.query.filter_by(username='admin').first()
     if not admin:
         hashed_pw = generate_password_hash('admin123', method='pbkdf2:sha256')
@@ -118,6 +120,16 @@ def return_book(book_id):
         flash("Error: You can only return books that you borrowed!", "danger")
     return redirect(url_for('index'))
 
+
+def keep_alive():
+    while True:
+        try:
+            requests.get("https://e-library-1-wwo0.onrender.com")
+        except:
+            pass
+        time.sleep(800)
+
+threading.Thread(target=keep_alive, daemon=True).start()
+
 if __name__ == '__main__':
-    # Local development only
     app.run(debug=True)
