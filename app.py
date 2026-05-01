@@ -6,7 +6,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import os
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'pokemonanddoraemon'
+
 
 # Database Configuration
 uri = os.getenv("DATABASE_URL")
@@ -18,8 +18,6 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
 
-# --- CRITICAL FIX FOR RENDER ---
-# This block runs during the app startup, allowing Gunicorn to see it.
 with app.app_context():
     db.create_all()
     # Check for admin user inside the context
